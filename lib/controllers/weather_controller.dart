@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:dio/dio.dart';
 import 'package:weather_app/models/weather.dart';
 import 'package:weather_app/repositories/weather_repository.dart';
 
@@ -10,10 +11,13 @@ class WeatherController {
   get tempStream => _tempStream.stream;
 
   Future<void> getTemperature() async{
-    _tempStream.add(null);
-    await Future.delayed(Duration(seconds: 2));
-     Map<String,dynamic> response= await _weatherRepository.fetchCurrentTemp();
-     WeatherModel weather=WeatherModel.fromJson(response);
-     _tempStream.add(weather.main!.temp!);
+    try {
+      _tempStream.add(null);
+       Map<String,dynamic> response= await _weatherRepository.fetchCurrentTemp();
+       WeatherModel weather=WeatherModel.fromJson(response);
+       _tempStream.add(weather.main!.temp!);
+    } on DioError catch (e) {
+      print(e.error);
+    }
   }
 }
